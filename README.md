@@ -3,3 +3,4 @@
 ![Ekran Görüntüsü (30)](https://user-images.githubusercontent.com/61361924/205903581-b387ea18-90f0-43c7-aedb-ae434867cba1.png)
 
 Uygulama 21 günlük kuluçka dönemi için ayarlanmıştır, Lamba kontrolü röle devresi kullanılarak yapılmıştır, Sıcaklık durumuna göre belli bir derecenin altına gelinmesi ile lamba çalışır ve ısıyı yükseltir sonra lamba kapanır, projede kuluçka kalan süre ve durum kontrolü yapılabilir.
+projeyi çalıştırmak için rar dosyasını indirebilirsiniz.
