@@ -1,0 +1,565 @@
+'****************************************************************
+'*  Name    : UNTITLED.BAS                                      *
+'*  Author  : [select VIEW...EDITOR OPTIONS]                    *
+'*  Notice  : Copyright (c) 2022 [select VIEW...EDITOR OPTIONS] *
+'*          : All Rights Reserved                               *
+'*  Date    : 13.02.2022                                        *
+'*  Version : 1.0                                               *
+'*  Notes   : 16008118047                                       *
+'*          : beyza arslan /BÝLGÝSAYAR MÜHENDÝSLÝÐÝ             *
+'****************************************************************
+
+Define	LCD_DREG	PORTB
+Define	LCD_DBIT	4
+DEFINE LCD_COMMANDUS 2000
+DEFINE LCD_DATAUS 50
+Define  LCD_RWREG   PORTB
+Define  LCD_RWBIT   1
+Define	LCD_RSREG	PORTB
+Define	LCD_RSBIT	0
+Define  LCD_LINES   2
+Define	LCD_EREG	PORTB
+Define	LCD_EBIT	2
+Define  LCD_BITS    4
+SHT11pin var PORTD.5    
+
+
+deger var word
+fahrenaht VAR WORD
+fahrenahtdegeri VAR WORD
+Tamdeger var word
+Kusurat var word
+reg1 var byte
+
+
+    X           VAR WORD
+    KONTROL VAR     BYTE       
+    ISI1    VAR     BYTE      
+    ISI2    VAR     BYTE      
+    U1      VAR     BYTE          
+    U2      VAR     BYTE 
+    H0      VAR     HAM.BYTE0 
+    H1      VAR     HAM.BYTE1 
+    HAM      VAR       WORD 
+    RAW     VAR     WORD 
+    ISI     VAR     WORD 
+    P1      VAR     WORD 
+    P2      VAR     WORD 
+    P3      VAR     WORD              
+    W       VAR     WORD 
+    CLK     VAR     PORTA.0 
+    DTA     VAR     PORTA.1  
+    ISARET  VAR     BIT   
+    HATA    VAR     BIT 
+        
+ CLEAR
+      ADCON1 = 7
+      
+      
+     
+  TRISA=%11110000
+  TRISB=%00000000
+  trisc=%11110001
+  TRISD=%11111111
+  TRISE=%11111111
+  
+  Pause 500       
+ 
+
+    Lcdout $fe, 1     
+LCDOUT $FE,1         
+LCDOUT $FE,1,"BEYZA ARSLAN"                
+LCDOUT $FE,$C0,"BOZOK UNIVERSITESI"		
+LCDOUT $FE, $94, "BILGISAYAR MUHENDISLIGI"
+LCDOUT $FE,$D4,"16008118047"
+   OWOut SHT11pin, 1, [$CC, $44] 
+cevirdinmi:
+   OWIn SHT11pin, 4, [reg1]
+   pause 10   
+   If reg1=0 Then cevirdinmi
+   OWOut SHT11pin,1,[$CC,$BE] 
+   OWIn SHT11pin,0,[deger.LOWBYTE,deger.HIGHBYTE] 
+   Tamdeger = deger/16  
+   Kusurat =((deger//16)*100)/16
+    fahrenaht=(tamdeger*9/5+(32))
+   fahrenahtdegeri= fahrenaht
+   Kusurat =((deger//16)*100)/16
+    
+    Pause 500       ' Wait .5 second 
+     GOTO BASLA
+            
+
+BASLA:  
+ i var byte
+  SYMBOL BASLAT=PORTA.5
+  SYMBOL SU_ALT=PORTA.4
+  SYMBOL SU_UST=PORTA.3
+  SYMBOL KAPI=PORTE.1
+  SYMBOL VENTIL=PORTE.2
+  SYMBOL TERMO= PORTE.0
+  SYMBOL SU_MOTORU= PORTC.2
+  SYMBOL KAZAN_SOL= PORTC.0
+  SYMBOL KAZAN_SAG= PORTC.1
+
+ 
+        Output DTA:Output CLK 
+        High DTA 
+        Low CLK 
+        Pause 1 
+        High CLK 
+        Low DTA 
+        Pause 1 
+        Low CLK 
+        Pause 1 
+        High CLK 
+        Pause 1 
+        High DTA 
+        Low CLK 
+
+ KAPI_KILIT:
+LCDOUT $FE,1             	
+LCDOUT $FE,$80, "******************" 
+LCDOUT $FE,1,"BEYZA ARSLAN"
+LCDOUT $FE,$C0,"BOZOK UNIVERSITESI"
+LCDOUT $FE, $94, "BILGISAYAR MUH"
+LCDOUT $FE,$D4,"16008118047"
+LCDOUT $FE,$d4, "******************"                                
+            PORTE=%00000010 
+            PORTC=%11111111                     
+            PAUSE 2000                           
+            PAUSE 100
+            GOTO CIVCIV_VENTIL
+ CIVCIV_VENTIL: 
+ LCDOUT $FE,1             	
+LCDOUT $FE,$80,  "++++++++++++++++++++"
+LCDOUT $FE,$C0, " BILDIRCIN"
+LCDOUT $FE,$94, "YUMURTASI HAZIRLANIYOR"
+LCDOUT $FE,$d4,  "++++++++++++++++++++"                                 
+            PORTE=%00000110
+            PAUSE 5000           
+                                 
+           GOTO CIVCIV
+ CIVCIV:
+ LCDOUT $FE,1             	
+LCDOUT $FE,$80,  "++++++++++++++++++++"
+LCDOUT $FE,$C0, " BILDIRCIN"
+LCDOUT $FE,$94, "YUMURTASI ISINIYOR"
+LCDOUT $FE,$d4,  "++++++++++++++++++++"
+            PORTE=%00000010
+            PAUSE 1000
+            PORTE=%00000011                      
+            PAUSE 5000
+            goto ISIT
+ ISIT:        
+LCDOUT $FE,1             	
+LCDOUT $FE,$80,  "++++++++++++++++++++"
+LCDOUT $FE,$C0, " BILDIRCIN ISINMA"
+LCDOUT $FE,$94, "BASLADI"
+LCDOUT $FE,$d4,  "++++++++++++++++++++"
+           PORTE=%00000010 
+           pause 500
+           FOR i=1 to 3                    
+           PORTC=%11111110
+           PAUSE 2000
+           PORTC=%11111101
+           PAUSE 2000  
+           next i
+           pause 500
+           goto CIVCIV_OLDU
+ 
+CIVCIV_OLDU:
+LCDOUT $FE,1             	
+LCDOUT $FE,$80,  "++++++++++++++++++++"
+LCDOUT $FE,$C0, " BILDIRCIN"
+LCDOUT $FE,$94, "OLDU"
+LCDOUT $FE,$d4,  "++++++++++++++++++++"
+            PORTC=%11111111
+            PAUSE 2000
+            GOTO CIVCIV_CEVIR
+CIVCIV_CEVIR:
+LCDOUT $FE,1             	
+LCDOUT $FE,$80, "******************" 
+LCDOUT $FE,$C0, " BILDIRCIN"
+LCDOUT $FE,$94, "SAGA CEVRILIYOR"
+LCDOUT $FE,$d4, "******************"
+            PORTC=%11111011                 
+            pause 5000
+            GOTO CIVCIV_CEVIR_DUR
+
+CIVCIV_CEVIR_DUR:
+LCDOUT $FE,1             	
+LCDOUT $FE,$80, "******************" 
+LCDOUT $FE,$C0, " BILDIRCIN"
+LCDOUT $FE,$94, "ALANI GENISLEDI"
+LCDOUT $FE,$d4, "******************"
+            PORTC=%11111111
+            PAUSE 1000  
+            GOTO CIVCIV_CIKIS
+CIVCIV_CIKIS:
+LCDOUT $FE,1             	
+LCDOUT $FE,$80, "******************" 
+LCDOUT $FE,$C0, " BILDIRCIN"
+LCDOUT $FE,$94, "CIKISA HAZIRLANIYOR"
+LCDOUT $FE,$d4, "******************"
+            PORTE=%00000110
+            pause 5000                    
+                                         
+            GOTO TAHLIYE
+            
+TAHLIYE:
+LCDOUT $FE,1             	
+LCDOUT $FE,$80, "******************" 
+LCDOUT $FE,$C0, " BILDIRCIN TAHLIYE"
+LCDOUT $FE,$94, "YAPILIYOR"
+LCDOUT $FE,$d4, "******************"
+           PORTE=%00000010 
+           PAUSE 500
+           FOR i=1 to 3                     
+           PORTC=%11111110
+           PAUSE 2000
+           PORTC=%11111101
+           PAUSE 2000    
+           next i
+           PAUSE 500
+           goto KAPI_AC
+            
+ KAPI_AC:
+ LCDOUT $FE,1             	
+LCDOUT $FE,$80, "******************" 
+LCDOUT $FE,$C0, "KAPI"
+LCDOUT $FE,$94, "ACILIYOR"
+LCDOUT $FE,$d4, "******************"
+            PORTC=%11111111
+            PAUSE 2000
+            GOTO KAPI_TAHLIYE
+            
+ KAPI_TAHLIYE:
+ LCDOUT $FE,1             	
+LCDOUT $FE,$80, "******************" 
+LCDOUT $FE,$C0, "KAPIDAN"
+LCDOUT $FE,$94, " BILDIRCIN TAHLIYE EDILIYOR"
+LCDOUT $FE,$d4, "******************"
+           
+            PORTC=%11111011                
+            pause 5000
+            GOTO TAHLIYE_S
+ 
+ TAHLIYE_S:
+ LCDOUT $FE,1             	
+LCDOUT $FE,$80, "******************" 
+LCDOUT $FE,$C0, "TAHLIYE"
+LCDOUT $FE,$94, "YAPILIYOR"
+LCDOUT $FE,$d4, "******************"
+            PORTC=%11111101
+            PAUSE 8000
+            GOTO SON
+ SON:
+LCDOUT $FE,1             
+LCDOUT $FE,$80, "******************" 
+LCDOUT $FE,$C0, "SISTEM"
+LCDOUT $FE,$94, "KAPANIYOR"
+LCDOUT $FE,$d4, "******************"
+           PORTC=%11111111         
+            PAUSE 2000
+            PORTE=%00000000                          
+            PAUSE 1000
+            LCDOUT $FE,1   
+            
+            GOTO CIVCIV_VENTIL_S
+ CIVCIV_VENTIL_S: 
+ LCDOUT $FE,1             	
+LCDOUT $FE,$80,  "++++++++++++++++++++"
+LCDOUT $FE,$C0, "TAVUK"
+LCDOUT $FE,$94, "YUMURTASI HAZIRLANIYOR"
+LCDOUT $FE,$d4,  "++++++++++++++++++++"                                
+            PORTE=%00000110
+            PAUSE 5000           
+                                 
+           GOTO CIVCIV_S
+ CIVCIV_S:
+ LCDOUT $FE,1             	
+LCDOUT $FE,$80,  "++++++++++++++++++++"
+LCDOUT $FE,$C0, "TAVUK"
+LCDOUT $FE,$94, "YUMURTASI ISINIYOR"
+LCDOUT $FE,$d4,  "++++++++++++++++++++"
+            PORTE=%00000010
+            PAUSE 1000
+            PORTE=%00000011                      
+            PAUSE 5000
+            goto ISIT_S
+ ISIT_S:        
+LCDOUT $FE,1             	
+LCDOUT $FE,$80,  "++++++++++++++++++++"
+LCDOUT $FE,$C0, "TAVUK ISINMA"
+LCDOUT $FE,$94, "BASLADI"
+LCDOUT $FE,$d4,  "++++++++++++++++++++"
+           PORTE=%00000010 
+           pause 500
+           FOR i=1 to 3                     
+           PORTC=%11111110
+           PAUSE 2000
+           PORTC=%11111101
+           PAUSE 2000  
+           next i
+           pause 500
+           goto CIVCIV_OLDU_S
+ 
+CIVCIV_OLDU_S:
+LCDOUT $FE,1             	
+LCDOUT $FE,$80,  "++++++++++++++++++++"
+LCDOUT $FE,$C0, "TAVUK"
+LCDOUT $FE,$94, "OLDU"
+LCDOUT $FE,$d4,  "++++++++++++++++++++"
+            PORTC=%11111111
+            PAUSE 2000
+            GOTO CIVCIV_CEVIR_SAS
+CIVCIV_CEVIR_SAS:
+LCDOUT $FE,1             
+LCDOUT $FE,$80,  "++++++++++++++++++++"
+LCDOUT $FE,$C0, "TAVUK"
+LCDOUT $FE,$94, "SAGA CEVRILIYOR"
+LCDOUT $FE,$d4,  "++++++++++++++++++++"
+            PORTC=%11111011                
+            pause 5000
+            GOTO CIVCIV_CEVIR_DUR_A
+
+CIVCIV_CEVIR_DUR_A:
+LCDOUT $FE,1             	
+LCDOUT $FE,$80,  "++++++++++++++++++++"
+LCDOUT $FE,$C0, "TAVUK"
+LCDOUT $FE,$94, "ALANI GENISLEDI"
+LCDOUT $FE,$d4,  "++++++++++++++++++++"
+            PORTC=%11111111
+            PAUSE 1000  
+            GOTO CIVCIV_CIKIS_S
+CIVCIV_CIKIS_S:
+LCDOUT $FE,1             	
+LCDOUT $FE,$80, "++++++++++++++++++++"
+LCDOUT $FE,$C0, "TAVUK"
+LCDOUT $FE,$94, "CIKISA HAZIRLANIYOR"
+LCDOUT $FE,$d4,  "++++++++++++++++++++"
+            PORTE=%00000110
+            pause 5000                    
+                                         
+            GOTO TAHLIYE_SA
+            
+TAHLIYE_SA:
+LCDOUT $FE,1             	
+LCDOUT $FE,$80,  "++++++++++++++++++++"
+LCDOUT $FE,$C0, "TAVUK TAHLIYE"
+LCDOUT $FE,$94, "YAPILIYOR"
+LCDOUT $FE,$d4,  "++++++++++++++++++++"
+           PORTE=%00000010 
+           PAUSE 500
+           FOR i=1 to 3                     
+           PORTC=%11111110
+           PAUSE 2000
+           PORTC=%11111101
+           PAUSE 2000    
+           next i
+           PAUSE 500
+           goto KAPI_AC_S
+            
+ KAPI_AC_S:
+ LCDOUT $FE,1             
+LCDOUT $FE,$80, "++++++++++++++++++++"
+LCDOUT $FE,$C0, "KAPI"
+LCDOUT $FE,$94, "ACILIYOR"
+LCDOUT $FE,$d4, "++++++++++++++++++++"
+            PORTC=%11111111
+            PAUSE 2000
+            GOTO KAPI_TAHLIYE_SSS
+            
+ KAPI_TAHLIYE_SSS:
+ LCDOUT $FE,1             	
+LCDOUT $FE,$80,  "++++++++++++++++++++"
+LCDOUT $FE,$C0, "KAPIDAN"
+LCDOUT $FE,$94, "TAVUK TAHLIYE EDILIYOR"
+LCDOUT $FE,$d4,  "++++++++++++++++++++"
+           
+            PORTC=%11111011               
+            pause 5000
+            GOTO TAHLIYE_SS
+ 
+ TAHLIYE_SS:
+ LCDOUT $FE,1             
+LCDOUT $FE,$80,  "++++++++++++++++++++"
+LCDOUT $FE,$C0, "TAHLIYE"
+LCDOUT $FE,$94, "YAPILIYOR"
+LCDOUT $FE,$d4,  "++++++++++++++++++++"
+            PORTC=%11111101
+            PAUSE 8000
+            GOTO SON
+ SON_S:
+LCDOUT $FE,1             	
+LCDOUT $FE,$80,  "++++++++++++++++++++" 
+LCDOUT $FE,$C0, "SISTEM"
+LCDOUT $FE,$94, "KAPANIYOR"
+LCDOUT $FE,$d4,  "++++++++++++++++++++"
+    GOTO CIVCIV_VENTIL_SS
+    
+ CIVCIV_VENTIL_SS: 
+ LCDOUT $FE,1             	
+LCDOUT $FE,$80, "++++++++++++++++++++" 
+LCDOUT $FE,$C0, "KAZ"
+LCDOUT $FE,$94, "YUMURTASI HAZIRLANIYOR"
+LCDOUT $FE,$d4, "++++++++++++++++++++"                                
+            PORTE=%00000110
+            PAUSE 5000           
+                                 
+           GOTO CIVCIV_SIT
+ CIVCIV_SIT:
+ LCDOUT $FE,1             	
+LCDOUT $FE,$80, "++++++++++++++++++++"
+LCDOUT $FE,$C0, "KAZ"
+LCDOUT $FE,$94, "YUMURTASI ISINIYOR"
+LCDOUT $FE,$d4, "++++++++++++++++++++"
+            PORTE=%00000010
+            PAUSE 1000
+            PORTE=%00000011                    
+            PAUSE 5000
+            goto ISIT_SIT
+ ISIT_SIT:        
+LCDOUT $FE,1             	
+LCDOUT $FE,$80, "++++++++++++++++++++"
+LCDOUT $FE,$C0, "KAZ ISINMA"
+LCDOUT $FE,$94, "BASLADI"
+LCDOUT $FE,$94, "++++++++++++++++++++" 
+           PORTE=%00000010 
+           pause 500
+           FOR i=1 to 3                     
+           PORTC=%11111110
+           PAUSE 2000
+           PORTC=%11111101
+           PAUSE 2000  
+           next i
+           pause 500
+           goto CIVCIV_OLDU_STAST
+ 
+CIVCIV_OLDU_STAST:
+LCDOUT $FE,$80, "++++++++++++++++++++"
+LCDOUT $FE,$C0, "KAZ"
+LCDOUT $FE,$94, "OLDU"
+LCDOUT $FE,$d4, "++++++++++++++++++++"
+            PORTC=%11111111
+            PAUSE 2000
+            GOTO CIVCIV_CEVIR_SAST
+CIVCIV_CEVIR_SAST:
+LCDOUT $FE,1             	
+LCDOUT $FE,$80, "++++++++++++++++++++"
+LCDOUT $FE,$C0, "KAZ"
+LCDOUT $FE,$94, "SAGA CEVRILIYOR"
+LCDOUT $FE,$d4, "++++++++++++++++++++"
+            PORTC=%11111011                 
+            pause 5000
+            GOTO CIVCIV_CEVIR_DUR_ASD
+
+CIVCIV_CEVIR_DUR_ASD:
+LCDOUT $FE,1             	
+LCDOUT $FE,$80, "++++++++++++++++++++"
+LCDOUT $FE,$C0, "KAZ"
+LCDOUT $FE,$94, "ALANI GENISLEDI"
+LCDOUT $FE,$d4, "++++++++++++++++++++"
+            PORTC=%11111111
+            PAUSE 1000  
+            GOTO CIVCIV_CIKIS_STA
+CIVCIV_CIKIS_STA:
+LCDOUT $FE,1             	
+LCDOUT $FE,$80, "++++++++++++++++++++" 
+LCDOUT $FE,$C0, "KAZ"
+LCDOUT $FE,$94, "CIKISA HAZIRLANIYOR"
+LCDOUT $FE,$d4, "++++++++++++++++++++"
+            PORTE=%00000110
+            pause 5000                    
+                                        
+            GOTO TAHLIYE_SAT
+            
+TAHLIYE_SAT:
+LCDOUT $FE,1             	
+LCDOUT $FE,$80, "++++++++++++++++++++"
+LCDOUT $FE,$C0, "KAZ TAHLIYE"
+LCDOUT $FE,$94, "YAPILIYOR"
+LCDOUT $FE,$d4, "++++++++++++++++++++"
+           PORTE=%00000010 
+           PAUSE 500
+           FOR i=1 to 3                     
+           PORTC=%11111110
+           PAUSE 2000
+           PORTC=%11111101
+           PAUSE 2000    
+           next i
+           PAUSE 500
+           goto KAPI_AC_SASS
+            
+ KAPI_AC_SASS:
+ LCDOUT $FE,1             	
+LCDOUT $FE,$80, "******************" 
+LCDOUT $FE,$C0, "KAPI"
+LCDOUT $FE,$94, "ACILIYOR"
+LCDOUT $FE,$d4, "******************"
+            PORTC=%11111111
+            PAUSE 2000
+            GOTO KAPI_TAHLIYE_SSSS
+            
+ KAPI_TAHLIYE_SSSS:
+ LCDOUT $FE,1             	
+LCDOUT $FE,$80, "++++++++++++++++++++" 
+LCDOUT $FE,$C0, "KAPIDAN"
+LCDOUT $FE,$94, "KAZ TAHLIYE EDILIYOR"          
+LCDOUT $FE,$d4, "++++++++++++++++++++"
+           
+            PORTC=%11111011               
+            pause 5000
+            GOTO TAHLIYE_SS
+ 
+ TAHLIYE_SSS:
+ LCDOUT $FE,1             	
+LCDOUT $FE,$80, "++++++++++++++++++++" 
+LCDOUT $FE,$C0, "TAHLIYE"
+LCDOUT $FE,$94, "YAPILIYOR"
+LCDOUT $FE,$d4, "++++++++++++++++++++"
+            PORTC=%11111101
+            PAUSE 8000
+            GOTO SON_SS
+ SON_SS:
+LCDOUT $FE,1             	
+LCDOUT $FE,$80, "******************" 
+LCDOUT $FE,$C0, "SISTEM"
+LCDOUT $FE,$94, "KAPANIYOR"
+LCDOUT $FE,$d4, "******************"
+           PORTC=%11111111         
+            PAUSE 2000
+            PORTE=%00000000                          
+            PAUSE 1000
+            LCDOUT $FE,1   
+           PORTC=%11111111         
+            PAUSE 2000
+            PORTE=%00000000                          
+            PAUSE 1000
+            LCDOUT $FE,1     
+     
+        
+LCDOut $FE,1
+   LCDOut DEC2 ISI1,".",DEC1 ISI2,"0 C  N=",DEC U1,".",DEC1 U2,"%"
+   LCDOUT $FE,$C0,"ORTAM ISISI NORMAL"
+        LCDOUT $FE,$94,"FANLAR DURDU"
+        LCDOUT $FE,$D4,"YUMURTALAR CEVRILIYOR" 
+   if ISI1=%1111 then bip
+Z:
+pause 1000
+ 
+        
+SENSORYOK: LCDOut $FE,$02,"   SENSOR YOK   " 
+           LCDOut $FE,$C0," LUTFEN TAKINIZ "  
+           Pause 1000                
+           Return
+bip:
+    PORTD.6=1
+    PAUSE 250
+    PORTD.6=0
+    GOTO Z 
+end
+
+
+
+
